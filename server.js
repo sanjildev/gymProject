@@ -1,13 +1,16 @@
-const express=require('express')
-const app=express()
+const express = require("express");
+const connectDB = require("./config/db");
+const fighterRoute = require("./routes/fighterRoutes");
+const gymRoute = require("./routes/gymRoutes");
 
-const PORT=5000
+const app = express();
+app.use(express.json())
+require("dotenv").config();
 
-app.get('/',(req,res)=>{
-    res.send("MMA Dropzone server is running")
-})
+connectDB();
 
-
-app.listen(PORT,()=>{
-    console.log(`Server is running on http://localhost:${PORT}`);
-})
+app.use("/api/fighters", fighterRoute);
+app.use("/api/gyms", gymRoute);
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on http://localhost:${process.env.PORT}`);
+});
