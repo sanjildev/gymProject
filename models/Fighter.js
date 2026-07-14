@@ -61,7 +61,7 @@ const fighterSchema=new Schema({
         type:String
     },
     gym:{
-        type:mongoose.Schema.Types.ObjectId,
+        type:Schema.Types.ObjectId,
         ref:'Gym'
     }
 },{

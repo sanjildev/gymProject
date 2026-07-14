@@ -4,6 +4,6 @@ const { createGym, getAllGyms, getSingleGym, updateGym, deleteGym } = require('.
 const router=require('express').Router()
 
 router.route('/').post(upload.single("image"),createGym).get(getAllGyms)
-router.route('/:id').get(getSingleGym).patch(upload.single("image"),updateGym).delete(upload.single("image"),deleteGym)
+router.route('/:id').get(getSingleGym).patch(upload.single("image"),updateGym).delete(deleteGym)
 
 module.exports=router
