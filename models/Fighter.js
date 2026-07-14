@@ -54,6 +54,12 @@ const fighterSchema=new Schema({
         facebook:String,
         twitter:String
     },
+    imageUrl:{
+        type:String
+    },
+    imagePublicId:{
+        type:String
+    },
     gym:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Gym'

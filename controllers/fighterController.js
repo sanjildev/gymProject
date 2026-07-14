@@ -1,7 +1,8 @@
 const Fighter = require("../models/Fighter");
-
+const cloudinary=require('cloudinary').v2
 exports.createFighter = async (req, res) => {
   try {
+    
     const {
       name,
       nickname,
@@ -18,6 +19,8 @@ exports.createFighter = async (req, res) => {
       socialMediaLinks,
       gym,
     } = req.body;
+    const imageUrl=req.file ? req.file.path:undefined
+    const imagePublicId = req.file ? req.file.filename : undefined;
     const fighter = await Fighter.create({
       name,
       nickname,
@@ -33,6 +36,8 @@ exports.createFighter = async (req, res) => {
       status,
       socialMediaLinks,
       gym,
+      imageUrl,
+      imagePublicId
     });
     res.status(201).json({
       message: "Fighter created successfully!!",
@@ -92,29 +97,32 @@ exports.updateFighter = async (req, res) => {
       socialMediaLinks,
       gym,
     } = req.body;
-    const fighter = await Fighter.findByIdAndUpdate(
-      id,
-      {
-        name,
-        nickname,
-        dob,
-        nationality,
-        weightClass,
-        height,
-        reach,
-        stance,
-        wins,
-        losses,
-        draws,
-        status,
-        socialMediaLinks,
-        gym,
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+const updatedData={name,
+      nickname,
+      dob,
+      nationality,
+      weightClass,
+      height,
+      reach,
+      stance,
+      wins,
+      losses,
+      draws,
+      status,
+      socialMediaLinks,
+      gym,}
+      if(req.file){
+        const existingFighter=await Fighter.findById(id)
+        if(existingFighter && existingFighter.imagePublicId){
+          await cloudinary.uploader.destroy(existingFighter.imagePublicId)
+        }
+        updatedData.imageUrl=req.file.path
+        updatedData.imagePublicId=req.file.filename
+      }
+      const fighter=await Fighter.findByIdAndUpdate(id,updatedData,{
+        new:true,
+        runValidators:true
+      })
     if (!fighter) {
       return res.status(404).json({
         message: "Fighter Not Found With That ID",
@@ -132,6 +140,10 @@ exports.updateFighter = async (req, res) => {
 exports.deleteFighter = async (req, res) => {
   try {
     const { id } = req.params;
+    const existingFighter=await Fighter.findById(id)
+    if(existingFighter && existingFighter.imagePublicId){
+      await cloudinary.uploader.destroy(existingFighter.imagePublicId)
+    }
     const fighter = await Fighter.findByIdAndDelete(id);
     if (!fighter) {
       return res.status(404).json({

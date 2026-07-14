@@ -31,6 +31,12 @@ const gymSchema=new Schema({
     },
     headCoach:{
         type:String
+    },
+    imageUrl:{
+        type:String
+    },
+    imagePublicId:{
+        type:String
     }
 },{
     timestamps:true

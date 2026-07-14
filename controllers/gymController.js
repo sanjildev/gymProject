@@ -1,3 +1,4 @@
+const cloudinary=require('cloudinary').v2
 const Gym = require("../models/Gym");
 
 exports.createGym = async (req, res) => {
@@ -13,6 +14,8 @@ exports.createGym = async (req, res) => {
       disciplines,
       headCoach,
     } = req.body;
+    const imageUrl=req.file ? req.file.path:undefined
+    const imagePublicId=req.file ? req.file.filename : undefined
     const gym = await Gym.create({
       name,
       city,
@@ -23,6 +26,8 @@ exports.createGym = async (req, res) => {
       email,
       disciplines,
       headCoach,
+      imageUrl,
+      imagePublicId
     });
     res.status(201).json({
       message: "Gym Created Successfully!!",
@@ -83,19 +88,29 @@ exports.updateGym = async (req, res) => {
       disciplines,
       headCoach,
     } = req.body;
+    const updatedData={
+      name,
+      city,
+      address,
+      latitude,
+      longitude,
+      contact,
+      email,
+      disciplines,
+      headCoach,
+    } 
+    if(req.file){
+      const existingGym=await Gym.findById(id)
+      if(existingGym && existingGym.imagePublicId){
+        await cloudinary.uploader.destroy(existingGym.imagePublicId)
+      }
+      updatedData.imagePublicId=req.file.filename
+      updatedData.imageUrl=req.file.path
+    }
     const gym = await Gym.findByIdAndUpdate(
       id,
-      {
-        name,
-        city,
-        address,
-        latitude,
-        longitude,
-        contact,
-        email,
-        disciplines,
-        headCoach,
-      },
+       updatedData
+      ,
       {
         new: true,
         runValidators: true,
@@ -118,6 +133,10 @@ exports.updateGym = async (req, res) => {
 exports.deleteGym = async (req, res) => {
   try {
     const { id } = req.params;
+    const existingGym=await Gym.findById(id)
+      if(existingGym && existingGym.imagePublicId){
+        await cloudinary.uploader.destroy(existingGym.imagePublicId)
+      }
     const gym = await Gym.findByIdAndDelete(id);
     if (!gym) {
       return res.status(404).json({
