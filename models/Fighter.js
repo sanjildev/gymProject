@@ -67,4 +67,5 @@ const fighterSchema=new Schema({
 },{
     timestamps:true
 })
+
 module.exports=mongoose.model('Fighter',fighterSchema)

@@ -1,5 +1,6 @@
 const cloudinary=require('cloudinary').v2
 const Event = require("../models/Event")
+const Fight = require('../models/Fight')
 
 exports.createEvent=async(req,res)=>{
     try {
@@ -23,7 +24,13 @@ exports.createEvent=async(req,res)=>{
 
 exports.getAllEvents=async(req,res)=>{
     try {
-    const events=await Event.find()
+    const events=await Event.find().populate({
+  path: 'fights',
+  populate: [
+    { path: 'fighterA', select: 'name nickname imageUrl' },
+    { path: 'fighterB', select: 'name nickname imageUrl' }
+  ]
+})
     if(events.length==0){
         return res.status(200).json({
             message:"NO Event Available!!",
@@ -44,7 +51,13 @@ exports.getAllEvents=async(req,res)=>{
 exports.getSingleEvent=async(req,res)=>{
     try {
     const {id}=req.params
-    const event=await Event.findById(id)
+    const event=await Event.findById(id).populate({
+        path:'fights',
+        populate:[
+             { path: 'fighterA', select: 'name nickname imageUrl' },
+    { path: 'fighterB', select: 'name nickname imageUrl' }
+        ]
+    })
     if(!event){
         return res.status(404).json({
             message:"NO Event Available with that id!!",
@@ -73,9 +86,23 @@ exports.updateEvent=async(req,res)=>{
         updatedEvent.imageUrl=req.file.path
         updatedEvent.imagePublicId=req.file.filename
     }
+if (status === "Completed") {
+  const scheduledFights = await Fight.find({ event: id, status: "Scheduled" });
+  if (scheduledFights.length > 0) {
+    return res.status(400).json({
+      message: "Cannot mark event as completed while fights are still scheduled"
+    });
+  }
+}
     const event=await Event.findByIdAndUpdate(
         id,updatedEvent,{new:true,runValidators:true}
-    )
+    ).populate({
+        path:'fights',
+        populate:[
+             { path: 'fighterA', select: 'name nickname imageUrl' },
+    { path: 'fighterB', select: 'name nickname imageUrl' }
+        ]
+    })
     if(!event){
         return res.status(404).json({
             message:"No Event With That ID"

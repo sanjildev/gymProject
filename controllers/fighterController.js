@@ -50,7 +50,7 @@ exports.createFighter = async (req, res) => {
 
 exports.getAllFighters = async (req, res) => {
   try {
-    const fighters = await Fighter.find();
+    const fighters = await Fighter.find().populate('gym',"name headCoach")
     res.status(200).json({
       message: "All Fighters Fetched Successfully!!",
       data: fighters,
