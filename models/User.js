@@ -27,6 +27,7 @@ isActive:{
     type:Boolean,
     default:true
 },
+tokenVersion: { type: Number, default: 0 },
 imageUrl:String,
 imagePublicId:String
 },{
