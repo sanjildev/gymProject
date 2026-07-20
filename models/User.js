@@ -29,7 +29,9 @@ isActive:{
 },
 tokenVersion: { type: Number, default: 0 },
 imageUrl:String,
-imagePublicId:String
+imagePublicId:String,
+resetPasswordToken:String,
+resetPasswordExpires:Date
 },{
     timestamps:true
 })
